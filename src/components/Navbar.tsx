@@ -29,7 +29,7 @@ const Navbar: React.FC<Props> = ({ onKeys }) => (
             key={r.to}
             to={r.to}
             end={r.to === "/"}
-            className={({ isActive }) =>
+            className={({ isActive }: { isActive: boolean }) =>
               `px-3 py-1.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${
                 isActive
                   ? "bg-[#1e1e2c] text-amber-400"
