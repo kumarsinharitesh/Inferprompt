@@ -46,7 +46,7 @@ export class GeminiProvider implements InferenceProvider {
                 candidates: Array<{ content: { parts: Array<{ text: string }> } }>;
               };
               const text = d.candidates[0]?.content?.parts[0]?.text;
-              if (text) { ctrl.enqueue(enc.encode(text)); return; }
+              if (text) { ctrl.enqueue(enc.encode(text)); }
             } catch { /* skip */ }
           }
         }

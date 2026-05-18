@@ -23,7 +23,7 @@ function parseSse(raw: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
           try {
             const d = JSON.parse(json) as { choices: Array<{ delta: { content?: string } }> };
             const text = d.choices[0]?.delta?.content;
-            if (text) { ctrl.enqueue(enc.encode(text)); return; }
+            if (text) { ctrl.enqueue(enc.encode(text)); }
           } catch { /* skip bad frame */ }
         }
       }
