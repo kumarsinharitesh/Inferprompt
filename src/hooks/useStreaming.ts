@@ -134,8 +134,17 @@ export function useStreaming(): StreamingState {
 
         if (!controller.signal.aborted) {
           setStatus("done");
-        
-          session.setOutputA(collectedTokens.join(""));
+          
+          const newOutput = collectedTokens.join("");
+          const oldA = session.getOutputA();
+          
+          // Auto-detect two outputs for diffing:
+          // If Output A already exists and isn't identical, shift it to B
+          if (oldA && oldA !== newOutput) {
+            session.setOutputB(oldA);
+          }
+          
+          session.setOutputA(newOutput);
         }
       } catch (err: unknown) {
         clearStreamTimeout();
