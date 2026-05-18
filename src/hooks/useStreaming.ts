@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import type { InferenceRequest, StreamingStatus } from "../types";
 import { createProvider } from "../services/providerFactory";
 import { computeMetrics } from "../utils/metrics";
@@ -134,17 +134,6 @@ export function useStreaming(): StreamingState {
 
         if (!controller.signal.aborted) {
           setStatus("done");
-          
-          const newOutput = collectedTokens.join("");
-          const oldA = session.getOutputA();
-          
-          // Auto-detect two outputs for diffing:
-          // If Output A already exists and isn't identical, shift it to B
-          if (oldA && oldA !== newOutput) {
-            session.setOutputB(oldA);
-          }
-          
-          session.setOutputA(newOutput);
         }
       } catch (err: unknown) {
         clearStreamTimeout();
@@ -171,15 +160,24 @@ export function useStreaming(): StreamingState {
   if (rawOutput.includes("</think>")) {
     displayOutput = rawOutput.split("</think>")[1].trimStart();
   } else if (rawOutput.trimStart().startsWith("<")) {
-    
     if (rawOutput.includes("<think>")) {
       displayOutput = "";
       isThinking = true;
     }
   }
-
-  
   displayOutput = displayOutput.replace(/<think>[\s\S]*?(?:<\/think>|$)/g, "").trimStart();
+
+  // Once streaming is done, persist the clean output to sessionStorage
+  // so the Diff page can auto-populate both boxes.
+  useEffect(() => {
+    if (status !== "done" || !displayOutput) return;
+    const oldA = session.getOutputA();
+    if (oldA && oldA !== displayOutput) {
+      session.setOutputB(oldA);
+    }
+    session.setOutputA(displayOutput);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
 
   return { 
     output: displayOutput, 

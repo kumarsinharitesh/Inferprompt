@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import type { DiffResult } from "../types";
 import { runABTD } from "../utils/diff";
 import { session } from "../utils/storage";
@@ -29,6 +29,16 @@ const DiffView: React.FC = () => {
   const [textB, setTextB] = useState(session.getOutputB());
   const [result, setResult] = useState<DiffResult | null>(null);
   const [running, setRunning] = useState(false);
+
+  // Re-read from sessionStorage every time this page mounts so
+  // navigating from Playground -> Diff always shows the latest outputs.
+  useEffect(() => {
+    const a = session.getOutputA();
+    const b = session.getOutputB();
+    if (a) setTextA(a);
+    if (b) setTextB(b);
+    setResult(null);
+  }, []);
 
   const canCompare = textA.trim().length > 0 && textB.trim().length > 0;
 
