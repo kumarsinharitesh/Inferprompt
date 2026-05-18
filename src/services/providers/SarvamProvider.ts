@@ -49,7 +49,7 @@ export class SarvamProvider implements InferenceProvider {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.key}` },
       body: JSON.stringify({
-        model: "sarvam-2b-v0.5",
+        model: "sarvam-m",
         messages: [
           ...(req.systemPrompt ? [{ role: "system", content: req.systemPrompt }] : []),
           { role: "user", content },
