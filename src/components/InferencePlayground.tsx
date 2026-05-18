@@ -16,7 +16,7 @@ const examples = [
   "How does speculative decoding speed up inference?",
 ];
 
-// Allow at most one submission every 2 seconds
+
 const rateLimit = createRateLimiter(2000);
 
 const InferencePlayground: React.FC = () => {
@@ -33,7 +33,7 @@ const InferencePlayground: React.FC = () => {
   const submit = useCallback(async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (stream.status === "streaming") return;
-    if (!rateLimit()) return; // debounce rapid clicks
+    if (!rateLimit()) return; 
 
     const safePrompt = sanitizePrompt(prompt);
     const safeSystem = sanitizeSystem(systemMsg);
@@ -238,7 +238,8 @@ const InferencePlayground: React.FC = () => {
         </div>
 
         <StreamingOutput
-          tokens={stream.tokens}
+          output={stream.output}
+          isThinking={stream.isThinking}
           status={stream.status}
           error={stream.error}
           onRetry={() => void submit()}

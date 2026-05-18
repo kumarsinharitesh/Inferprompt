@@ -2,21 +2,22 @@ import React, { useEffect, useRef } from "react";
 import type { StreamingStatus } from "../types";
 
 interface Props {
-  tokens: string[];
+  output: string;
+  isThinking?: boolean;
   status: StreamingStatus;
   error: string | null;
   onRetry?: () => void;
   onAbort?: () => void;
 }
 
-const StreamingOutput: React.FC<Props> = ({ tokens, status, error, onRetry, onAbort }) => {
+const StreamingOutput: React.FC<Props> = ({ output, isThinking, status, error, onRetry, onAbort }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [tokens.length]);
+  }, [output.length]);
 
-  const empty = tokens.length === 0;
+  const empty = output.length === 0;
 
   return (
     <div className="flex flex-col gap-2">
@@ -58,17 +59,24 @@ const StreamingOutput: React.FC<Props> = ({ tokens, status, error, onRetry, onAb
         {empty && status === "idle" && (
           <p className="text-slate-600 text-sm italic">Output will stream here…</p>
         )}
-        {empty && status === "streaming" && (
+        {empty && status === "streaming" && !isThinking && (
           <span className="inline-block w-1.5 h-4 bg-amber-400 animate-pulse rounded-sm" />
+        )}
+        
+        {isThinking && (
+          <div className="flex items-center gap-2 text-slate-500 text-sm italic mb-2">
+            <svg className="animate-spin text-slate-600" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            Model is thinking...
+          </div>
         )}
 
         <span className="text-slate-200 whitespace-pre-wrap break-words">
-          {tokens.map((tok, i) => (
-            <span key={i} className="animate-token">{tok}</span>
-          ))}
+          {output}
         </span>
 
-        {status === "streaming" && tokens.length > 0 && (
+        {status === "streaming" && !empty && (
           <span className="inline-block w-1 h-4 ml-0.5 bg-amber-400 animate-pulse align-middle rounded-sm" />
         )}
 

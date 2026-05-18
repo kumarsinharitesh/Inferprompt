@@ -24,19 +24,8 @@ function parseSse(raw: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
           if (json === "[DONE]") { ctrl.close(); return; }
           try {
             const d = JSON.parse(json) as { choices: Array<{ delta: { content?: string } }> };
-            let text = d.choices[0]?.delta?.content;
-            if (text) {
-              // Strip <think> blocks
-              if (text.includes("<think>")) isThinking = true;
-              if (text.includes("</think>")) {
-                isThinking = false;
-                text = text.split("</think>")[1] || "";
-              }
-              if (!isThinking && text) {
-                text = text.replace("<think>", "");
-                ctrl.enqueue(enc.encode(text));
-              }
-            }
+            const text = d.choices[0]?.delta?.content;
+            if (text) { ctrl.enqueue(enc.encode(text)); }
           } catch { /* skip bad frame */ }
         }
       }

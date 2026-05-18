@@ -7,7 +7,7 @@ import { session } from "../utils/storage";
 
 export interface StreamingState {
   output: string;
-  
+  rawOutput: string;
   tokens: string[];
   status: StreamingStatus;
   error: string | null;
@@ -16,11 +16,9 @@ export interface StreamingState {
     tokensPerSec: number;
     latencyMs: number;
   };
-
+  isThinking: boolean;
   start: (request: InferenceRequest) => Promise<void>;
- 
   abort: () => void;
-
   reset: () => void;
 }
 
@@ -157,7 +155,33 @@ export function useStreaming(): StreamingState {
     [clearStreamTimeout]
   );
 
-  const output = tokens.join("");
+  const rawOutput = tokens.join("");
+  let displayOutput = rawOutput;
+  let isThinking = false;
 
-  return { output, tokens, status, error, metrics, start, abort, reset };
+  if (rawOutput.includes("</think>")) {
+    displayOutput = rawOutput.split("</think>")[1].trimStart();
+  } else if (rawOutput.trimStart().startsWith("<")) {
+    
+    if (rawOutput.includes("<think>")) {
+      displayOutput = "";
+      isThinking = true;
+    }
+  }
+
+  
+  displayOutput = displayOutput.replace(/<think>[\s\S]*?(?:<\/think>|$)/g, "").trimStart();
+
+  return { 
+    output: displayOutput, 
+    rawOutput, 
+    tokens, 
+    status, 
+    error, 
+    metrics, 
+    start, 
+    abort, 
+    reset,
+    isThinking 
+  };
 }
