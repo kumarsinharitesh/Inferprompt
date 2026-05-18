@@ -7,8 +7,6 @@ function parseSse(raw: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
   const reader = raw.getReader();
   let buf = "";
 
-  let isThinking = false;
-
   return new ReadableStream({
     async pull(ctrl) {
       while (true) {

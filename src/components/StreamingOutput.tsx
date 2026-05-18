@@ -92,7 +92,7 @@ const StreamingOutput: React.FC<Props> = ({ output, isThinking, status, error, o
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-red-400">Stream failed</p>
             <p className="text-xs text-slate-500 mt-0.5 break-words">{error}</p>
-            {tokens.length > 0 && (
+            {output.length > 0 && (
               <p className="text-xs text-slate-600 mt-1 italic">Partial output preserved above.</p>
             )}
           </div>
@@ -108,7 +108,7 @@ const StreamingOutput: React.FC<Props> = ({ output, isThinking, status, error, o
         </div>
       )}
 
-      {status === "aborted" && tokens.length > 0 && (
+      {status === "aborted" && output.length > 0 && (
         <p role="status" className="text-xs text-slate-600 italic px-1">
           Stopped. Partial output preserved.
         </p>
