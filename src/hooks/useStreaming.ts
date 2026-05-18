@@ -154,18 +154,19 @@ export function useStreaming(): StreamingState {
   );
 
   const rawOutput = tokens.join("");
-  let displayOutput = rawOutput;
-  let isThinking = false;
+  
+  // Strip <think> / </think> XML tags but KEEP the content inside.
+  // sarvam-m wraps its entire answer in <think> tags — hiding the content
+  // results in a blank screen. We show content, just remove the markup.
+  const strippedOutput = rawOutput
+    .replace(/<think>/g, "")
+    .replace(/<\/think>/g, "")
+    .trimStart();
 
-  if (rawOutput.includes("</think>")) {
-    displayOutput = rawOutput.split("</think>")[1].trimStart();
-  } else if (rawOutput.trimStart().startsWith("<")) {
-    if (rawOutput.includes("<think>")) {
-      displayOutput = "";
-      isThinking = true;
-    }
-  }
-  displayOutput = displayOutput.replace(/<think>[\s\S]*?(?:<\/think>|$)/g, "").trimStart();
+  const displayOutput = strippedOutput;
+
+  // Show the "thinking" spinner only while STREAMING and no visible text yet
+  const isThinking = status === "streaming" && strippedOutput.length === 0;
 
   // Once streaming is done, persist the clean output to sessionStorage
   // so the Diff page can auto-populate both boxes.
