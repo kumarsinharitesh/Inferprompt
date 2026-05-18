@@ -137,7 +137,7 @@ const WelcomePage: React.FC = () => {
       <div className="mx-auto w-half max-w-2xl border border-[#1e1e2c] rounded-2xl bg-[#12121a] flex overflow-hidden mb-16">
         <StatPill value="5" label="Providers" />
         <StatPill value="ABTD" label="Diff Algo" />
-        <StatPill value="Server-Sent Events" label="Streaming" />
+        <StatPill value="SSE" label="Streaming" />
       </div>
 
       {/* Live token demo  */}
