@@ -45,7 +45,7 @@ export class SarvamProvider implements InferenceProvider {
 
   async streamResponse(req: InferenceRequest): Promise<ReadableStream<Uint8Array>> {
     const content = req.mode === "audio" ? (req.text ?? "") : (req.text ?? "");
-    const res = await fetch("https://api.sarvam.ai/v1/chat/completions", {
+    const res = await fetch("/api/sarvam/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.key}` },
       body: JSON.stringify({
