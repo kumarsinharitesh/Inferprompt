@@ -46,9 +46,7 @@ export function useAudioRecorder(): AudioRecorderState {
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const secs = useRef(0);
 
-  // Accumulate only finalized sentences across recognition events.
-  // We keep a ref to avoid stale closures; onresult rebuilds from the
-  // full results array using resultIndex so we don't double-count.
+  
   const finalizedText = useRef("");
 
   const supportsTranscription = SpeechRecognitionAPI !== null;
