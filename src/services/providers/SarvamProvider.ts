@@ -7,6 +7,8 @@ function parseSse(raw: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
   const reader = raw.getReader();
   let buf = "";
 
+  let isThinking = false;
+
   return new ReadableStream({
     async pull(ctrl) {
       while (true) {
@@ -22,8 +24,19 @@ function parseSse(raw: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
           if (json === "[DONE]") { ctrl.close(); return; }
           try {
             const d = JSON.parse(json) as { choices: Array<{ delta: { content?: string } }> };
-            const text = d.choices[0]?.delta?.content;
-            if (text) { ctrl.enqueue(enc.encode(text)); }
+            let text = d.choices[0]?.delta?.content;
+            if (text) {
+              // Strip <think> blocks
+              if (text.includes("<think>")) isThinking = true;
+              if (text.includes("</think>")) {
+                isThinking = false;
+                text = text.split("</think>")[1] || "";
+              }
+              if (!isThinking && text) {
+                text = text.replace("<think>", "");
+                ctrl.enqueue(enc.encode(text));
+              }
+            }
           } catch { /* skip bad frame */ }
         }
       }
@@ -56,6 +69,7 @@ export class SarvamProvider implements InferenceProvider {
         ],
         stream: true,
         max_tokens: 512,
+        temperature: 0.3,
       }),
     });
     if (!res.ok) throw new Error(`Sarvam ${res.status}: ${await res.text()}`);
